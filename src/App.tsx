@@ -1,11 +1,16 @@
-import EventCard from './components/EventCard'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import EventList from './components/EventList'
 
 function App() {
   return (
-    <>
-      <div>Hello</div>
-      <EventCard />
-    </>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={<EventList />}
+        />
+      </Routes>
+    </Router>
   )
 }
 
