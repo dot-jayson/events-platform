@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import EventList from './components/EventList'
+import EventList from './pages/EventList'
 
 function App() {
   return (

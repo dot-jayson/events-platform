@@ -1,5 +1,5 @@
 import { mockEvents } from '../mock/mockEvents'
-import SingleEventCard from './SingleEventCard'
+import SingleEventCard from '../components/SingleEventCard'
 
 const EventList = () => {
   return (
