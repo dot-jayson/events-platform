@@ -1,6 +1,9 @@
 import { useState } from 'react'
 
 const CreateEvent = () => {
+  // Loading state
+  const [loading, setLoading] = useState(false)
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState('')
@@ -9,14 +12,21 @@ const CreateEvent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Add event to data, log for now
-    console.log({ title, description, date, location, imageURL })
-    // Reset form
-    setTitle('')
-    setDescription('')
-    setDate('')
-    setLocation('')
-    setImageURL('')
+    setLoading(true)
+    // Simulate an API call or data processing delay
+    setTimeout(() => {
+      console.log({ title, description, date, location, imageURL })
+
+      // Reset form
+      setTitle('')
+      setDescription('')
+      setDate('')
+      setLocation('')
+      setImageURL('')
+
+      // Reset loading state after submission
+      setLoading(false)
+    }, 2000) // Simulating a delay of 2 seconds (replace with actual API call)
   }
 
   return (
@@ -76,6 +86,7 @@ const CreateEvent = () => {
           Location
         </label>
         <input
+          id="location"
           type="text"
           placeholder="Location"
           value={location}
@@ -103,7 +114,7 @@ const CreateEvent = () => {
           rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 
           focus:ring-blue-500 focus:ring-opacity-50"
         >
-          Create Event
+          {loading ? <span>Submitting...</span> : <span>Create Event</span>}
         </button>
       </form>
     </div>
