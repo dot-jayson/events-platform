@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { Navigate } from 'react-router-dom'
 
 const CreateEvent = () => {
+  const { user, role, authLoading } = useAuth()
   // Loading state
   const [loading, setLoading] = useState(false)
 
@@ -9,6 +12,18 @@ const CreateEvent = () => {
   const [date, setDate] = useState('')
   const [location, setLocation] = useState('')
   const [imageURL, setImageURL] = useState('')
+
+  if (authLoading) {
+    return <div>Loading...</div> // Auth loading state
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" /> // Redirect if not authenticated
+  }
+
+  if (role !== 'staff') {
+    return <div>You do not have permission to create events.</div> // Message for users trying to add events
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,7 +68,7 @@ const CreateEvent = () => {
           className="w-full p-2 border border-gray-300 rounded"
         />
         <label
-          htmlFor="title"
+          htmlFor="description"
           className="block text-sm font-medium"
         >
           Description
@@ -111,8 +126,8 @@ const CreateEvent = () => {
         <button
           type="submit"
           className="w-full py-2 px-4 bg-blue-500 text-white 
-          rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 
-          focus:ring-blue-500 focus:ring-opacity-50"
+            rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 
+            focus:ring-blue-500 focus:ring-opacity-50"
         >
           {loading ? <span>Submitting...</span> : <span>Create Event</span>}
         </button>
