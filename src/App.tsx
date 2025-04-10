@@ -4,6 +4,8 @@ import CreateEvent from './pages/CreateEvent'
 import Auth from './pages/Auth'
 import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
+import StaffOnlyRoute from './components/StaffOnlyRoute'
 
 function App() {
   return (
@@ -13,7 +15,11 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<EventList />}
+            element={
+              <ProtectedRoute>
+                <EventList />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/auth"
@@ -21,7 +27,11 @@ function App() {
           />
           <Route
             path="create-event"
-            element={<CreateEvent />}
+            element={
+              <StaffOnlyRoute>
+                <CreateEvent />
+              </StaffOnlyRoute>
+            }
           />
         </Routes>
       </Router>

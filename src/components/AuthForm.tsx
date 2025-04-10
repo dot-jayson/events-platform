@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
+import { useNavigate } from 'react-router-dom'
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -15,6 +16,8 @@ const AuthForm = () => {
   const [lastName, setLastName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,6 +30,7 @@ const AuthForm = () => {
         console.log('Logged in successfully')
         setEmail('')
         setPassword('')
+        navigate('/')
       } else {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -34,6 +38,7 @@ const AuthForm = () => {
           password
         )
         console.log('Account created')
+        navigate('/')
 
         const user = userCredential.user
 
