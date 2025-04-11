@@ -5,6 +5,8 @@ interface SingleEventCard {
 }
 
 const SingleEventCard: React.FC<SingleEventCard> = ({ event }) => {
+  const formattedDate = event.date.toDate().toLocaleDateString()
+
   return (
     <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden ">
       {/* Image Section */}
@@ -21,7 +23,7 @@ const SingleEventCard: React.FC<SingleEventCard> = ({ event }) => {
 
         <div className="mt-4 text-gray-600 text-sm">
           <p>{event.location}</p>
-          <p>{event.date}</p>
+          <p>{formattedDate}</p>
         </div>
 
         {/* Add to Calendar Button */}

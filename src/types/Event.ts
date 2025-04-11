@@ -1,10 +1,12 @@
+import { Timestamp } from 'firebase/firestore'
+
 export interface Event {
-  id?: string
+  id: string
   title: string
-  date: string
+  date: Timestamp
   description: string
   location: string
   imageURL: string
-  createdBy: string
   attendees: string[]
+  createdBy: string
 }
