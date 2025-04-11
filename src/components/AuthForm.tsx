@@ -47,6 +47,7 @@ const AuthForm = () => {
           first_name: firstName,
           last_name: lastName,
           role: 'user',
+          myEvents: [],
         })
 
         setEmail('')

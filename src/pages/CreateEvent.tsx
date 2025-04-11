@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Navigate } from 'react-router-dom'
+import { db } from '../lib/firebase'
+import { collection, addDoc } from 'firebase/firestore'
+import { Timestamp } from 'firebase/firestore'
 
 const CreateEvent = () => {
   const { user, role, authLoading } = useAuth()
@@ -12,6 +15,11 @@ const CreateEvent = () => {
   const [date, setDate] = useState('')
   const [location, setLocation] = useState('')
   const [imageURL, setImageURL] = useState('')
+
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState('')
+  // Error message state
+  const [errorMessage, setErrorMessage] = useState('')
 
   if (authLoading) {
     return <div>Loading...</div> // Auth loading state
@@ -25,12 +33,27 @@ const CreateEvent = () => {
     return <div>You do not have permission to create events.</div> // Message for users trying to add events
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // Simulate an API call or data processing delay
-    setTimeout(() => {
-      console.log({ title, description, date, location, imageURL })
+    setSuccessMessage('')
+    setErrorMessage('')
+
+    // Event data object
+    const eventData = {
+      title,
+      description,
+      date: Timestamp.fromDate(new Date(date)),
+      location,
+      imageURL,
+      createdBy: user.uid, // Firebase user UID
+      attendees: [], // Empty array initially
+    }
+
+    try {
+      // Add event to Firestore
+      await addDoc(collection(db, 'events'), eventData)
+      setSuccessMessage('Event created successfully!')
 
       // Reset form
       setTitle('')
@@ -38,10 +61,12 @@ const CreateEvent = () => {
       setDate('')
       setLocation('')
       setImageURL('')
-
-      // Reset loading state after submission
+    } catch (e) {
+      console.error('Error creating event: ', e)
+      setErrorMessage('Failed to create event. Please try again.')
+    } finally {
       setLoading(false)
-    }, 2000) // Simulating a delay of 2 seconds (replace with actual API call)
+    }
   }
 
   return (
@@ -49,6 +74,12 @@ const CreateEvent = () => {
       <h2 className="text-2xl font-semibold text-center mb-4">
         Create New Event
       </h2>
+      {successMessage && (
+        <div className="text-green-600 mb-4 text-center">{successMessage}</div>
+      )}
+      {errorMessage && (
+        <div className="text-red-600 mb-4 text-center">{errorMessage}</div>
+      )}
       <form
         onSubmit={handleSubmit}
         className="space-y-4"

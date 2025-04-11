@@ -64,6 +64,15 @@ const Navbar = () => {
           </Link>
         )}
 
+        {user && !isOnAuthPage && (
+          <Link
+            to="/my-events"
+            className="text-lg font-semibold text-blue-600 hover:text-blue-400"
+          >
+            My Events
+          </Link>
+        )}
+
         {user && role === 'staff' && !isOnAuthPage && (
           <Link
             to="/create-event"
@@ -105,6 +114,16 @@ const Navbar = () => {
               onClick={() => setMenuOpen(false)} // Close menu when link is clicked
             >
               Home
+            </Link>
+          )}
+
+          {user && !isOnAuthPage && (
+            <Link
+              to="/my-events"
+              className="text-lg font-semibold text-blue-600 hover:text-blue-400"
+              onClick={() => setMenuOpen(false)} // Close menu when link is clicked
+            >
+              My Events
             </Link>
           )}
 
