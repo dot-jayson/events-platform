@@ -10,6 +10,7 @@ const EventDetail = () => {
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
+  const [isSignedUp, setIsSignedUp] = useState(false)
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -36,6 +37,23 @@ const EventDetail = () => {
     fetchEvent()
   }, [eventId])
 
+  useEffect(() => {
+    const checkIfSignedUp = async () => {
+      if (!user || !eventId) return
+
+      const userRef = doc(db, 'users', user.uid)
+      const userSnap = await getDoc(userRef)
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data()
+        const signedUp = userData.myEvents?.includes(eventId)
+        setIsSignedUp(signedUp)
+      }
+    }
+
+    checkIfSignedUp()
+  }, [user, eventId])
+
   const handleSignUp = async () => {
     if (!user || !event) return
     try {
@@ -50,6 +68,8 @@ const EventDetail = () => {
       await updateDoc(eventRef, {
         attendees: arrayUnion(user.uid),
       })
+
+      setIsSignedUp(true)
     } catch (err) {
       console.error('Sign up error:', err)
       alert('Failed to sign up. Please try again.')
@@ -71,10 +91,17 @@ const EventDetail = () => {
       <p className="text-gray-800 mb-2">{event.location}</p>
       <p className="text-gray-700 mb-2">{event.description}</p>
       <button
-        className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600"
+        disabled={isSignedUp}
+        className={`mt-4 w-full py-2 px-4 rounded-full 
+            ${
+              isSignedUp
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }
+            text-white focus:outline-none focus:ring-2 focus:ring-opacity-50`}
         onClick={handleSignUp}
       >
-        Sign Up
+        {isSignedUp ? "You're Signed Up!" : 'Sign Up'}
       </button>
     </div>
   )
