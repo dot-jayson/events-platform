@@ -72,6 +72,7 @@ const MyEvents = () => {
             <SingleEventCard
               key={myEvent.id}
               event={myEvent}
+              isMyEventView
             />
           ))}
         </div>

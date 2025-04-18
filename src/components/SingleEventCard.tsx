@@ -1,16 +1,24 @@
 import { useNavigate } from 'react-router-dom'
 import { Event } from '../types/Event'
 
-interface SingleEventCard {
+interface SingleEventCardProps {
   event: Event
+  isMyEventView?: boolean
 }
 
-const SingleEventCard: React.FC<SingleEventCard> = ({ event }) => {
+const SingleEventCard: React.FC<SingleEventCardProps> = ({
+  event,
+  isMyEventView,
+}) => {
   const navigate = useNavigate()
   const formattedDate = event.date.toDate().toLocaleDateString()
 
-  const handleSeeMore = () => {
-    navigate(`/events/${event.id}`)
+  const handleClick = () => {
+    if (isMyEventView) {
+      alert('Calendar functionality')
+    } else {
+      navigate(`/events/${event.id}`)
+    }
   }
 
   return (
@@ -35,9 +43,9 @@ const SingleEventCard: React.FC<SingleEventCard> = ({ event }) => {
         {/* See More Button */}
         <button
           className="mt-4 w-full py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          onClick={handleSeeMore}
+          onClick={handleClick}
         >
-          See More
+          {isMyEventView ? 'Add to Calendar' : 'See More'}
         </button>
       </div>
     </div>
