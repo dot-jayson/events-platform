@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import StaffOnlyRoute from './components/StaffOnlyRoute'
 import EventDetail from './pages/EventDetail'
+import MyEvents from './pages/MyEvents'
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EventDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-events"
+            element={
+              <ProtectedRoute>
+                <MyEvents />
               </ProtectedRoute>
             }
           />
