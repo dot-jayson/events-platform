@@ -1,68 +1,59 @@
-import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { Navigate } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Timestamp, addDoc, collection } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { collection, addDoc } from 'firebase/firestore'
-import { Timestamp } from 'firebase/firestore'
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const CreateEvent = () => {
-  const { user, role, authLoading } = useAuth()
-  // Loading state
-  const [loading, setLoading] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState('')
   const [location, setLocation] = useState('')
   const [imageURL, setImageURL] = useState('')
-
-  // Success message state
-  const [successMessage, setSuccessMessage] = useState('')
-  // Error message state
+  const [date, setDate] = useState('')
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
+  const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-
-  if (authLoading) {
-    return <div>Loading...</div> // Auth loading state
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" /> // Redirect if not authenticated
-  }
-
-  if (role !== 'staff') {
-    return <div>You do not have permission to create events.</div> // Message for users trying to add events
-  }
+  const [successMessage, setSuccessMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setSuccessMessage('')
-    setErrorMessage('')
 
-    // Event data object
+    if (!user) return
+
+    setLoading(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    const startDateTime = new Date(`${date}T${startTime}`)
+    let endDateTime = new Date(`${date}T${endTime}`)
+
+    // Check if the end time is earlier than the start time, adjust to the next day if needed
+    if (endDateTime < startDateTime) {
+      endDateTime = new Date(endDateTime.getTime() + 24 * 60 * 60 * 1000) // Add 1 day
+    }
+
     const eventData = {
       title,
       description,
-      date: Timestamp.fromDate(new Date(date)),
       location,
       imageURL,
-      createdBy: user.uid, // Firebase user UID
-      attendees: [], // Empty array initially
+      date: Timestamp.fromDate(new Date(date)),
+      startTime: Timestamp.fromDate(startDateTime),
+      endTime: Timestamp.fromDate(endDateTime),
+      createdBy: user.uid,
+      attendees: [],
     }
 
     try {
-      // Add event to Firestore
       await addDoc(collection(db, 'events'), eventData)
       setSuccessMessage('Event created successfully!')
-
-      // Reset form
-      setTitle('')
-      setDescription('')
-      setDate('')
-      setLocation('')
-      setImageURL('')
-    } catch (e) {
-      console.error('Error creating event: ', e)
+      navigate('/')
+    } catch (err) {
+      console.error('Error creating event:', err)
       setErrorMessage('Failed to create event. Please try again.')
     } finally {
       setLoading(false)
@@ -70,97 +61,143 @@ const CreateEvent = () => {
   }
 
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <h2 className="text-2xl font-semibold text-center mb-4">
-        Create New Event
-      </h2>
+    <div className="max-w-xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Create New Event</h2>
+
       {successMessage && (
-        <div className="text-green-600 mb-4 text-center">{successMessage}</div>
+        <div className="text-green-600 mb-4">{successMessage}</div>
       )}
-      {errorMessage && (
-        <div className="text-red-600 mb-4 text-center">{errorMessage}</div>
-      )}
+      {errorMessage && <div className="text-red-600 mb-4">{errorMessage}</div>}
+
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
       >
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium"
-        >
-          Event Title
-        </label>
-        <input
-          id="title"
-          type="text"
-          placeholder="Event Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium"
-        >
-          Description
-        </label>
-        <textarea
-          id="description"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <label
-          htmlFor="date"
-          className="block text-sm font-medium"
-        >
-          Date
-        </label>
-        <input
-          id="date"
-          type="date"
-          placeholder="Date and time"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <label
-          htmlFor="location"
-          className="block text-sm font-medium"
-        >
-          Location
-        </label>
-        <input
-          id="location"
-          type="text"
-          placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        {/* Image, change to file selector later on */}
-        <label
-          htmlFor="image"
-          className="block text-sm font-medium"
-        >
-          Image
-        </label>
-        <input
-          id="image"
-          type="text"
-          placeholder="Image URL"
-          value={imageURL}
-          onChange={(e) => setImageURL(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
+        <div>
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Title
+          </label>
+          <input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Title"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Description
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Description"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="location"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Location
+          </label>
+          <input
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Location"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="imageURL"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Image URL
+          </label>
+          <input
+            id="imageURL"
+            value={imageURL}
+            onChange={(e) => setImageURL(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Image URL"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="date"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Date
+          </label>
+          <input
+            id="date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="startTime"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Start Time
+          </label>
+          <input
+            id="startTime"
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="endTime"
+            className="block text-sm font-medium text-gray-700"
+          >
+            End Time
+          </label>
+          <input
+            id="endTime"
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-blue-500 text-white 
-            rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 
-            focus:ring-blue-500 focus:ring-opacity-50"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          disabled={loading}
         >
-          {loading ? <span>Submitting...</span> : <span>Create Event</span>}
+          {loading ? 'Submitting...' : 'Create Event'}
         </button>
       </form>
     </div>

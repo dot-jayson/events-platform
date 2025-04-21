@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Event, GoogleCalendarEvent } from '../types/Event'
+import { Event } from '../types/Event'
 import { useGoogleCalendar } from '../hooks/useGoogleCalendar'
 
 interface SingleEventCardProps {
@@ -12,30 +12,26 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
   isMyEventView,
 }) => {
   const navigate = useNavigate()
-  const formattedDate = event.date.toDate().toLocaleDateString()
   const { signInAndAddEvent } = useGoogleCalendar()
 
   const handleAddToCalendar = () => {
-    const start = event.date.toDate()
-    const end = new Date(start.getTime() + 60 * 60 * 1000) // One hour default to event for now
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-    // Create the calendar event object directly
-    const calendarEvent: GoogleCalendarEvent = {
+    const googleEvent = {
       summary: event.title,
       description: event.description,
       location: event.location,
       start: {
-        dateTime: start.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: event.startTime.toDate().toISOString(),
+        timeZone,
       },
       end: {
-        dateTime: end.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        dateTime: event.endTime.toDate().toISOString(),
+        timeZone,
       },
     }
 
-    // Pass the calendar event directly to Google Calendar integration
-    signInAndAddEvent(calendarEvent)
+    signInAndAddEvent(googleEvent)
   }
 
   const handleClick = () => {
@@ -59,10 +55,24 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
       <div className="p-4">
         <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
         <p className="text-gray-700 text-sm mt-1">{event.description}</p>
-
         <div className="mt-4 text-gray-600 text-sm">
           <p>{event.location}</p>
-          <p>{formattedDate}</p>
+          <p>
+            {event.startTime.toDate().toLocaleDateString(undefined, {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+            })}{' '}
+            {event.startTime.toDate().toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })}{' '}
+            –{' '}
+            {event.endTime.toDate().toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
+          </p>
         </div>
 
         {/* See More Button */}
