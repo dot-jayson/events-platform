@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { Event } from '../types/Event'
+import { Event, GoogleCalendarEvent } from '../types/Event'
+import { useGoogleCalendar } from '../hooks/useGoogleCalendar'
 
 interface SingleEventCardProps {
   event: Event
@@ -12,10 +13,34 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
 }) => {
   const navigate = useNavigate()
   const formattedDate = event.date.toDate().toLocaleDateString()
+  const { signInAndAddEvent } = useGoogleCalendar()
+
+  const handleAddToCalendar = () => {
+    const start = event.date.toDate()
+    const end = new Date(start.getTime() + 60 * 60 * 1000) // One hour default to event for now
+
+    // Create the calendar event object directly
+    const calendarEvent: GoogleCalendarEvent = {
+      summary: event.title,
+      description: event.description,
+      location: event.location,
+      start: {
+        dateTime: start.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      end: {
+        dateTime: end.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+    }
+
+    // Pass the calendar event directly to Google Calendar integration
+    signInAndAddEvent(calendarEvent)
+  }
 
   const handleClick = () => {
     if (isMyEventView) {
-      alert('Calendar functionality')
+      handleAddToCalendar()
     } else {
       navigate(`/events/${event.id}`)
     }
