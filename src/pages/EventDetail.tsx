@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore'
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { Event } from '../types/Event'
 import { useAuth } from '../context/AuthContext'
@@ -56,9 +65,35 @@ const EventDetail = () => {
 
   const handleSignUp = async () => {
     if (!user || !event) return
+
     try {
-      // Add eventId to myEvents field in users document
       const userRef = doc(db, 'users', user.uid)
+      const userSnap = await getDoc(userRef)
+
+      const myEvents: string[] = userSnap.exists()
+        ? userSnap.data().myEvents || []
+        : []
+
+      // Check limit of 5 future events
+      if (myEvents.length > 0) {
+        const q = query(
+          collection(db, 'events'),
+          where('__name__', 'in', myEvents)
+        )
+        const snapshot = await getDocs(q)
+
+        const now = new Date()
+        const futureEvents = snapshot.docs.filter(
+          (doc) => new Date(doc.data().date.toDate()) > now
+        )
+
+        if (futureEvents.length >= 5) {
+          alert('You can only sign up for up to 5 upcoming events at a time.')
+          return
+        }
+      }
+
+      // Add eventId to myEvents field in users document
       await updateDoc(userRef, {
         myEvents: arrayUnion(event.id),
       })
@@ -70,6 +105,7 @@ const EventDetail = () => {
       })
 
       setIsSignedUp(true)
+      alert("You're signed up for the event!")
     } catch (err) {
       console.error('Sign up error:', err)
       alert('Failed to sign up. Please try again.')
@@ -93,12 +129,12 @@ const EventDetail = () => {
       <button
         disabled={isSignedUp}
         className={`mt-4 w-full py-2 px-4 rounded-full 
-            ${
-              isSignedUp
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600'
-            }
-            text-white focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+          ${
+            isSignedUp
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600'
+          }
+          text-white focus:outline-none focus:ring-2 focus:ring-opacity-50`}
         onClick={handleSignUp}
       >
         {isSignedUp ? "You're Signed Up!" : 'Sign Up'}
