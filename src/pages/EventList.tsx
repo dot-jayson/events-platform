@@ -72,6 +72,10 @@ const EventList = () => {
 
   return (
     <div className="p-4">
+      <p className="text-center">
+        <span className="font-semibold">Note:</span> You can only sign up to 5
+        upcoming events at a time.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
         {currentEvents.map((singleEvent) => (
           <SingleEventCard

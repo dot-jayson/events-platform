@@ -92,10 +92,13 @@ const MyEvents = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-2">My Events</h1>
-      <p className="text-gray-600 mb-4">
-        You have signed up for <strong>{eventCount}</strong> / 5 upcoming events
-      </p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-2">My Events</h1>
+        <p className="text-gray-600 mb-4">
+          You have signed up for <strong>{eventCount}</strong> / 5 upcoming
+          events
+        </p>
+      </div>
 
       {myEvents.length === 0 ? (
         <p>You haven't signed up for any upcoming events.</p>
