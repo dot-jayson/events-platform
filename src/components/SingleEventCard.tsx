@@ -60,7 +60,9 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
         <p className="text-gray-700 text-sm mt-1">{event.description}</p>
-        <div className="mt-4 text-gray-600 text-sm">
+
+        {/* Location and Date Section */}
+        <div className="mt-auto text-gray-600 text-sm">
           <p>{event.location}</p>
           <p>
             {event.startTime.toDate().toLocaleDateString(undefined, {
@@ -80,9 +82,9 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
           </p>
         </div>
 
-        {/* See More Button */}
+        {/* Button Section */}
         <button
-          className="mt-auto w-full py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="mt-4 w-full py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           onClick={handleClick}
         >
           {isMyEventView ? 'Add to Calendar' : 'See More'}
