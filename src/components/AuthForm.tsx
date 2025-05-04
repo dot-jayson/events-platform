@@ -46,6 +46,7 @@ const AuthForm = () => {
           email,
           first_name: firstName,
           last_name: lastName,
+          myEvents: [], // Initialize the myEvents field as an empty array
         })
 
         setEmail('')
