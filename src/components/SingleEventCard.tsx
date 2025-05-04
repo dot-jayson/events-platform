@@ -43,12 +43,17 @@ const SingleEventCard: React.FC<SingleEventCardProps> = ({
   }
 
   return (
-    <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden ">
+    <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden min-h-[450px]">
       {/* Image Section */}
       <img
         src={event.imageURL}
         alt={event.title}
-        className="w-full h-48 object-cover"
+        onError={(e) => {
+          const target = e.currentTarget
+          target.onerror = null
+          target.src = 'https://placehold.co/400x200'
+        }}
+        className="w-[400px] h-[200px] object-cover object-center"
       />
 
       {/* Content Section */}

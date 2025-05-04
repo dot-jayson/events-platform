@@ -35,7 +35,7 @@ const EventDetail = () => {
           } as Event
           setEvent(eventData)
         } else {
-          console.log('No such document!')
+          console.warn('Event document not found.')
         }
       } catch (err) {
         console.error('Error fetching event:', err)
@@ -49,14 +49,19 @@ const EventDetail = () => {
   useEffect(() => {
     const checkIfSignedUp = async () => {
       if (!user || !eventId) return
+      try {
+        const userRef = doc(db, 'users', user.uid)
+        const userSnap = await getDoc(userRef)
 
-      const userRef = doc(db, 'users', user.uid)
-      const userSnap = await getDoc(userRef)
-
-      if (userSnap.exists()) {
-        const userData = userSnap.data()
-        const signedUp = userData.myEvents?.includes(eventId)
-        setIsSignedUp(signedUp)
+        if (userSnap.exists()) {
+          const userData = userSnap.data()
+          const signedUp = userData.myEvents?.includes(eventId)
+          setIsSignedUp(signedUp)
+        } else {
+          console.warn('User document not found.')
+        }
+      } catch (err) {
+        console.error('Error checking user sign-up:', err)
       }
     }
 
@@ -73,6 +78,12 @@ const EventDetail = () => {
       const myEvents: string[] = userSnap.exists()
         ? userSnap.data().myEvents || []
         : []
+
+      // Prevent duplicate sign-up client-side
+      if (myEvents.includes(event.id)) {
+        alert("You're already signed up for this event.")
+        return
+      }
 
       // Check limit of 5 future events
       if (myEvents.length > 0) {
@@ -93,12 +104,12 @@ const EventDetail = () => {
         }
       }
 
-      // Add eventId to myEvents field in users document
+      // Add to user's myEvents
       await updateDoc(userRef, {
         myEvents: arrayUnion(event.id),
       })
 
-      // Add userId to attendees field in events document
+      // Add to event's attendees, prevent duplicates
       const eventRef = doc(db, 'events', event.id)
       await updateDoc(eventRef, {
         attendees: arrayUnion(user.uid),
@@ -112,8 +123,11 @@ const EventDetail = () => {
     }
   }
 
-  if (loading) return <p>Loading...</p>
-  if (!event) return <p>Event not found.</p>
+  if (loading) {
+    return <div>Loading event details</div>
+  }
+
+  if (!event) return <p className="text-center">Event not found.</p>
 
   return (
     <div className="max-w-2xl mx-auto p-4">

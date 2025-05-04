@@ -4,9 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 const Navbar = () => {
-  const { user, role, logout, authLoading } = useAuth()
+  const { user, logout, authLoading, isStaff } = useAuth() // Removed role
   const navigate = useNavigate()
-  // To check current path
   const location = useLocation()
   const isOnAuthPage = location.pathname === '/auth'
 
@@ -73,7 +72,7 @@ const Navbar = () => {
           </Link>
         )}
 
-        {user && role === 'staff' && !isOnAuthPage && (
+        {user && isStaff && !isOnAuthPage && (
           <Link
             to="/create-event"
             className="text-lg font-semibold text-blue-600 hover:text-blue-400"
@@ -127,7 +126,7 @@ const Navbar = () => {
             </Link>
           )}
 
-          {user && role === 'staff' && !isOnAuthPage && (
+          {user && isStaff && !isOnAuthPage && (
             <Link
               to="/create-event"
               className="text-lg font-semibold text-blue-600 hover:text-blue-400"

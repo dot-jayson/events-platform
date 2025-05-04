@@ -1,6 +1,12 @@
 import SingleEventCard from '../components/SingleEventCard'
 import { useEffect, useState } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { Event } from '../types/Event'
 
@@ -14,26 +20,23 @@ const EventList = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'events'))
+        const now = Timestamp.now()
+        const eventsRef = collection(db, 'events')
+        const futureEventsQuery = query(eventsRef, where('date', '>=', now))
+        const querySnapshot = await getDocs(futureEventsQuery)
+
         const eventsData: Event[] = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Event[]
 
-        const now = new Date()
+        const sortedEvents = eventsData.sort((a, b) => {
+          const dateA = new Date(a.date.toDate())
+          const dateB = new Date(b.date.toDate())
+          return dateA.getTime() - dateB.getTime()
+        })
 
-        const futureEvents = eventsData
-          .filter((event) => {
-            const eventDate = new Date(event.date.toDate())
-            return eventDate >= now
-          })
-          .sort((a, b) => {
-            const dateA = new Date(a.date.toDate())
-            const dateB = new Date(b.date.toDate())
-            return dateA.getTime() - dateB.getTime()
-          })
-
-        setEvents(futureEvents)
+        setEvents(sortedEvents)
       } catch (e) {
         console.error('Error loading events: ', e)
         setError('Failed to load events')
@@ -41,6 +44,7 @@ const EventList = () => {
         setLoading(false)
       }
     }
+
     fetchEvents()
   }, [])
 
@@ -84,7 +88,7 @@ const EventList = () => {
           />
         ))}
       </div>
-      {/* Pagination buttons*/}
+      {/* Pagination buttons */}
       <div className="flex justify-center items-center gap-4 mt-8">
         <button
           onClick={goToPreviousPage}

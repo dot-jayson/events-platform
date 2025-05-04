@@ -6,7 +6,7 @@ interface StaffOnlyRouteProps {
 }
 
 const StaffOnlyRoute = ({ children }: StaffOnlyRouteProps) => {
-  const { user, role, authLoading } = useAuth()
+  const { user, isStaff, authLoading } = useAuth()
 
   if (authLoading) return null
 
@@ -19,7 +19,7 @@ const StaffOnlyRoute = ({ children }: StaffOnlyRouteProps) => {
     )
   }
 
-  if (role !== 'staff') {
+  if (!isStaff) {
     return (
       <Navigate
         to="/"

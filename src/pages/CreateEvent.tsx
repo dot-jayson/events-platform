@@ -22,7 +22,7 @@ const CreateEvent = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!user) return
+    if (!user || loading) return
 
     setLoading(true)
     setErrorMessage('')
@@ -50,12 +50,15 @@ const CreateEvent = () => {
 
     try {
       await addDoc(collection(db, 'events'), eventData)
-      setSuccessMessage('Event created successfully!')
-      navigate('/')
+      setSuccessMessage('Event created successfully! Redirecting ...')
+
+      // Brief delay to show message before redirect
+      setTimeout(() => {
+        navigate('/')
+      }, 2500)
     } catch (err) {
       console.error('Error creating event:', err)
       setErrorMessage('Failed to create event. Please try again.')
-    } finally {
       setLoading(false)
     }
   }
@@ -63,11 +66,6 @@ const CreateEvent = () => {
   return (
     <div className="max-w-xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Create New Event</h2>
-
-      {successMessage && (
-        <div className="text-green-600 mb-4">{successMessage}</div>
-      )}
-      {errorMessage && <div className="text-red-600 mb-4">{errorMessage}</div>}
 
       <form
         onSubmit={handleSubmit}
@@ -194,12 +192,21 @@ const CreateEvent = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className={`w-full p-2 rounded text-white 
+    ${
+      loading
+        ? 'bg-gray-400 cursor-not-allowed'
+        : 'bg-blue-600 hover:bg-blue-700'
+    }`}
           disabled={loading}
         >
           {loading ? 'Submitting...' : 'Create Event'}
         </button>
       </form>
+      {successMessage && (
+        <div className="text-green-600 mb-4">{successMessage}</div>
+      )}
+      {errorMessage && <div className="text-red-600 mb-4">{errorMessage}</div>}
     </div>
   )
 }

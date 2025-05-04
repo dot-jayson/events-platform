@@ -1,11 +1,15 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react'
-import { auth, db } from '../lib/firebase'
-import { onAuthStateChanged, signOut, User } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { auth } from '../lib/firebase'
+import {
+  onAuthStateChanged,
+  signOut,
+  User,
+  getIdTokenResult,
+} from 'firebase/auth'
 
 interface AuthContextType {
   user: User | null
-  role: string | null
+  isStaff: boolean
   authLoading: boolean
   logout: () => Promise<void>
 }
@@ -16,32 +20,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null)
-  const [role, setRole] = useState<string | null>(null)
-  const [authLoading, setauthLoading] = useState<boolean>(true)
+  const [isStaff, setIsStaff] = useState<boolean>(false)
+  const [authLoading, setAuthLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUser(user)
-        console.log('User logged in:', user.uid, user.email)
-
-        const userDocRef = doc(db, 'users', user.uid)
-        const userDoc = await getDoc(userDocRef)
-
-        if (userDoc.exists()) {
-          const data = userDoc.data()
-          console.log('User role from Firestore:', data?.role)
-          setRole(data?.role || 'user')
-        } else {
-          console.log('No user doc found in Firestore')
-          setRole('user')
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setAuthLoading(true)
+      if (firebaseUser) {
+        const tokenResult = await getIdTokenResult(firebaseUser)
+        const claims = tokenResult.claims
+        setIsStaff(claims.staff === true)
+        setUser(firebaseUser)
       } else {
-        console.log('User logged out')
+        setIsStaff(false)
         setUser(null)
-        setRole(null)
       }
-      setauthLoading(false)
+      setAuthLoading(false)
     })
 
     return () => unsubscribe()
@@ -56,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   return (
-    <AuthContext.Provider value={{ user, role, authLoading, logout }}>
+    <AuthContext.Provider value={{ user, isStaff, authLoading, logout }}>
       {children}
     </AuthContext.Provider>
   )

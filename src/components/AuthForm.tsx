@@ -37,17 +37,15 @@ const AuthForm = () => {
           email,
           password
         )
+        const user = userCredential.user
         console.log('Account created')
         navigate('/')
 
-        const user = userCredential.user
-
+        // Create user profile in Firestore (no role)
         await setDoc(doc(db, 'users', user.uid), {
-          email: email,
+          email,
           first_name: firstName,
           last_name: lastName,
-          role: 'user',
-          myEvents: [],
         })
 
         setEmail('')
@@ -57,7 +55,7 @@ const AuthForm = () => {
       }
     } catch (err) {
       if (err instanceof FirebaseError) {
-        setError(err.message) // Show Firebase error if failed
+        setError(err.message)
       } else {
         setError('An unexpected error occurred.')
       }
@@ -95,7 +93,7 @@ const AuthForm = () => {
           className="w-full p-2 border border-gray-300 rounded"
           required
         />
-        {/* Add First Name and Last Name Fields only for Signup */}
+
         {!isLogin && (
           <>
             <label
@@ -131,6 +129,7 @@ const AuthForm = () => {
             />
           </>
         )}
+
         <label
           htmlFor="password"
           className="block text-sm font-medium"
