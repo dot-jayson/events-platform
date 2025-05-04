@@ -1,54 +1,49 @@
-# React + TypeScript + Vite
+# 🎉 Events Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple events platform that allows users to browse, sign up for, and add events to their Google Calendar.
 
-Currently, two official plugins are available:
+Built with:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React** (with **TypeScript**) for the frontend
+- **Firebase** for backend services including authentication and database
+- **Google Calendar API** for calendar integration
 
-## Expanding the ESLint configuration
+**Live App:** [jaysonevents.netlify.app](https://jaysonevents.netlify.app/)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 🔐 Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. When you visit the site, you'll land on the **Authentication page**.
+2. Click **"Create an account"**, fill in the form, and then click **"Sign Up"**.
+3. After signing up, you'll be redirected to the **Home page**.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🗓️ Browsing Events
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- On the **Home page**, you can view all upcoming events, ordered by date.
+- Click **"See More"** on any event card to view its full details.
+- To **sign up** for an event, click the **"Sign Up"** button on the event detail page.
+- Head to the **"My Events"** tab to view events you've signed up for.
+
+## 📅 Add Events to Google Calendar
+
+1. On the **"My Events"** page, click **"Add to Calendar"** for any event.
+2. A Google Sign-In window will pop up.
+3. Choose the Google account you wish to use.
+4. You may see a warning — click **"Advanced"**.
+5. Click **"Go to jaysonevents.netlify.app (unsafe)"**, then proceed.
+6. The event will now be added to your **Google Calendar**.
+
+## ✍️ Adding New Events (Staff Only)
+
+To add events, you must log in with a **staff account**:
+
+- **Username:** `testevents777@gmail.com`
+- **Password:** `staff123`
+
+Once logged in:
+
+1. You'll see a **"Create Event"** tab appear in the navigation bar.
+2. Click on it and fill in the form. (For the image, provide a valid image URL.)
+3. Click **"Create Event"**.
+4. You’ll be redirected to the **Home page**, and your new event will be visible.
