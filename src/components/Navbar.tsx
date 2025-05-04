@@ -24,7 +24,7 @@ const Navbar = () => {
       {/* Left Logo */}
       <div>
         <h1 className="text-2xl font-semibold">
-          Events <span className="text-blue-600 font-bold">Platform</span>
+          Jayson <span className="text-blue-600 font-bold">Events</span>
         </h1>
       </div>
 
